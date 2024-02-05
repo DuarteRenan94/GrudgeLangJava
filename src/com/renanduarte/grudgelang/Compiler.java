@@ -2,16 +2,18 @@ package com.renanduarte.grudgelang;
 
 import java.io.IOException;
 
-import static com.renanduarte.grudgelang.Utils.INSTRUCTIONS;;
+import static com.renanduarte.grudgelang.Utils.INSTRUCTIONS;
+import static com.renanduarte.grudgelang.Utils.BF_TO_GDG;
+import static com.renanduarte.grudgelang.Utils.GDG_TO_BF;
 
 public class Compiler {
-	private static final int MAX_MEMORY_LENGTH = 100;
-	private static final int TOKEN_LENGTH = 3;
-	private int[] memory = new int[MAX_MEMORY_LENGTH];
-	private int p = 0;
-	private int c = 0;
-	private String[] code;
-	private int colchete_abertura = -1;
+	protected static final int MAX_MEMORY_LENGTH = 100;
+	protected static final int TOKEN_LENGTH = 3;
+	protected int[] memory = new int[MAX_MEMORY_LENGTH];
+	protected int p = 0;
+	protected int c = 0;
+	protected String[] code;
+	protected int colchete_abertura = -1;
 	
 	public Compiler() {
 		
@@ -20,9 +22,9 @@ public class Compiler {
 	/**
 	 * Instruções da linguagem
 	 */
-	private void increase() { memory[p] ++;}
-	private void decrease() { memory[p] --;}
-	private void input() { 
+	protected void increase() { memory[p] ++;}
+	protected void decrease() { memory[p] --;}
+	protected void input() { 
 		try {
 			memory[p] = System.in.read();
 		} catch (IOException e) {
@@ -30,13 +32,13 @@ public class Compiler {
 			e.printStackTrace();
 		}
 	}
-	private void output() {
-		System.out.println(Character.toString(memory[p]));
+	protected void output() {
+		System.out.println((char)memory[p]);
 	}
 	
-	private void prev() { p--;  }
-	private void next() { p++; }
-	private void consumeLoop() {
+	protected void prev() { p--;  }
+	protected void next() { p++; }
+	protected void consumeLoop() {
 		colchete_abertura = c;
 		if(memory[p] == 0) {
 			for(int i=0;i<code.length;i++) {
@@ -47,17 +49,33 @@ public class Compiler {
 			colchete_abertura = -1;
 		}
 	}
-	private void exitLoop() {
+	protected void exitLoop() {
 		if(memory[p] > 0) { c = colchete_abertura; }
 	}
 	
-	private void convert(String sourceCode) {
+	protected void convert(String sourceCode) {
 		code = new String[sourceCode.length() / TOKEN_LENGTH];
 		for(int i=0;i<sourceCode.length();i+=TOKEN_LENGTH) {
 			code[c] = sourceCode.substring(i, i+TOKEN_LENGTH);
 			c++;
 		}
 		c = 0;
+	}
+	
+	public String convertFromBFCodeToGDG(String source) {
+		String tmp = "";
+		for(int i=0;i<source.length();i++) {
+			tmp += BF_TO_GDG.get(source.substring(i, i+1));
+		}
+		return tmp;
+	}
+	
+	public String convertFromGDGCodeToBF(String source) {
+		String tmp = "";
+		for(int i=0;i<source.length();i+=TOKEN_LENGTH) {
+			tmp += GDG_TO_BF.get(source.substring(i, i+TOKEN_LENGTH));
+		}
+		return tmp;
 	}
 	
 	/**
@@ -71,35 +89,42 @@ public class Compiler {
 	public void compile(String sourceCode) throws CompilerException {
 		convert(sourceCode);
 		while(c < code.length) {
-			switch(INSTRUCTIONS.get(code[c]).intValue()) {
-				case 0:
-					increase();
-					break;
-				case 1:
-					decrease();
-					break;
-				case 2:
-					next();
-					break;
-				case 3:
-					prev();
-					break;
-				case 4:
-					consumeLoop();
-					break;
-				case 5:
-					exitLoop();
-					break;
-				case 6:
-					input();
-					break;
-				case 7:
-					output();
-					break;
-				default:
-					throw new CompilerException("Erro de sintaxe no comando "+code[c]+".");
+			try {
+				switch(INSTRUCTIONS.get(code[c]).intValue()) {
+					case 0:
+						increase();
+						break;
+					case 1:
+						decrease();
+						break;
+					case 2:
+						next();
+						break;
+					case 3:
+						prev();
+						break;
+					case 4:
+						consumeLoop();
+						break;
+					case 5:
+						exitLoop();
+						break;
+					case 6:
+						input();
+						break;
+					case 7:
+						output();
+						break;
+					default:
+						throw new CompilerException("Erro de sintaxe no comando "+code[c]+".");
+				}
+			}catch(NullPointerException ex) {
+				throw new CompilerException(code[c] +" Comando inválido: Stacktrace \n"+ex.getMessage());
+			}catch(Exception ex) {
+				ex.printStackTrace();
 			}
 			c++;
 		}
+		
 	}
 }

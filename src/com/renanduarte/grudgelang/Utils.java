@@ -18,4 +18,38 @@ public class Utils {
 	    put("AAa", 6);	//Espera o usuário digitar alguma coisa na linha de comando
 	    put("AAA", 7);	//Exibe o conteúdo na posição atual da memória para o usuário
 	}};
+	
+	/*BF converter*/
+	public static final HashMap<String, String>BF_TO_GDG = new HashMap<String, String>(){
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		{
+		put("+", "aaa");
+	    put("-", "aaA");
+	    put(">", "aAa");
+	    put("<", "aAA");
+	    put("[", "Aaa");
+	    put("]", "AaA");
+	    put(",", "AAa");
+	    put(".", "AAA");
+	}};
+	
+	/*BF converter*/
+	public static final HashMap<String, String>GDG_TO_BF = new HashMap<String, String>(){
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		{
+		put("aaa", "+");
+	    put("aaA", "-");
+	    put("aAa", ">");
+	    put("aAA", "<");
+	    put("Aaa", "[");
+	    put("AaA", "]");
+	    put("AAa", ",");
+	    put("AAA", ".");
+	}};
 }
